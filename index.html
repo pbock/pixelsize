@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" manifest="offline.manifest">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<link rel="apple-touch-icon" href="apple-touch-icon.png">
+	<title>Image Size</title>
+	<style type="text/css">
+		body {
+			background-color: #ccc;
+			color: #333;
+			font: 20px "Helvetica Neue", sans-serif;
+			margin: 0;
+			min-height: calc(100vh - 70px);
+			position: relative;
+		}
+		form {
+			width: 100%;
+			height: 100%;
+			display: -webkit-flex;
+			display: flex;
+			display: flex;
+			-webkit-align-items: center;
+			align-items: center;
+			position: absolute;
+			font-weight: 300;
+			-webkit-justify-items: center;
+			justify-items: center;
+		}
+		p {
+			text-align: center;
+			-webkit-flex: auto;
+			flex: auto;
+		}
+		#file-list {
+			position: absolute;
+			top: 0;
+			left: 0;
+			margin: 0;
+			padding: 0;
+			list-style: none;
+			z-index: 1;
+		}
+		li {
+			box-sizing: border-box;
+			height: 3em;
+			display: -webkit-flex;
+			display: flex;
+			-webkit-align-items: center;
+			align-items: center;
+			background-color: #fff;
+			width: 100vw;
+		}
+		li + li {
+			border-top: .5px solid #ccc;
+		}
+		#file-list span {
+			position: relative;
+		}
+		#file-list span:before {
+			content: attr(title);
+			position: absolute;
+			top: 1.3rem;
+			font-size: .5em;
+			font-weight: 500;
+			letter-spacing: .05em;
+			opacity: .4;
+			text-transform: uppercase;
+		}
+		img {
+			-webkit-flex: auto;
+			flex: auto;
+			max-width: 3em;
+			max-height: 3em;
+			margin-right: .5em;
+		}
+		#target {
+			position: absolute;
+			z-index: 2;
+			top: 0;
+			left: 0;
+			opacity: 0;
+			width: 100vw;
+			height: 100%;
+		}
+	</style>
+</head>
+<body>
+	<form>
+		<input type="file" multiple id="target">
+		<ul id="file-list"></ul>
+		<p>Tap to select<br>one or more images</p>
+	</form>
+	<script type="text/javascript">
+		document.onreadystatechange = function () {
+			if (document.readyState === 'interactive') {
+				var target = document.getElementById('target');
+				var list = document.getElementById('file-list');
+				target.addEventListener('change', function (ev) {
+					var files = ev.target.files;
+					list.innerHTML = '';
+					for (var i=0, file; file=files[i]; i++) {
+						if (!file.type.match(/^image\//)) continue;
+						(function () {
+							var li = document.createElement('li');
+							var img = document.createElement('img');
+							img.src = URL.createObjectURL(file);
+							li.innerText = 'Loading ' + file.name + '…';
+							list.appendChild(li);
+							img.onload = function () {
+								URL.revokeObjectURL(this.src);
+								var width = this.width;
+								var height = this.height;
+								var span = document.createElement('span');
+								span.setAttribute('class', 'description');
+								li.innerText = '';
+								span.innerHTML = '<span title="Width">' + width + '</span> &times; <span title="Height">' + height + '</span>';
+								li.appendChild(img);
+								li.appendChild(span);
+							};
+						})();
+					}
+				});
+			}
+		}
+	</script>
+</body>
+</html>
+
